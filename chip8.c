@@ -28,7 +28,7 @@
 #include "chip8.h"
 #include <unistd.h>
 #include <stdint.h>
-#include <conio.h> /* getch() and kbhit() */
+
 FILE *rom;
 //Main file will handle 
 int main(void)
@@ -53,6 +53,7 @@ int main(void)
     for(int i = 0; i < FONT_END; i++){
         memory[i] = fontset[i];
     }
+
     ////printf("Font Set Loaded\n");
 
     //load rom
@@ -64,15 +65,17 @@ int main(void)
     else{
         ////printf("ROM loaded\n");
     }
+
     fread(rom_buffer, sizeof(unsigned char), MEM_SIZE, rom);
 
     for(int i = 0; i < MEM_SIZE; i++){
         memory[i + PROGRAM_START] = rom_buffer[i];
     }
     fclose(rom);
+
     //emulation initialization
-    PC = 0x200;
-    for(int i = 0; i < 16; i++){
+    PC = PROGRAM_START;
+    for(int i = 0; i < NUM_REGISTERS; i++){
         registers[i] = 0x0;
         stack[i] = 0x0;
     }
@@ -86,14 +89,13 @@ int main(void)
         }
     }
     update_screen = 0;
-    unsigned char rowU, rowL, colU, colL;
     srand(time(NULL)); //seed rng
     
-    int timer_div = 9;
-    int test = 0;
-    double total = 0;
+    int timer_div = TIMER_DIV;
+    int numCycles = 0;
+    double totalHz = 0;
     //--------------------------------------------------------------------------------------
-    //memory[0x1FF] = 5;
+    
 
     // Main game loop
     while (!WindowShouldClose() && PC < MEM_SIZE)    // Detect window close button or ESC key
@@ -102,12 +104,7 @@ int main(void)
         //----------------------------------------------------------------------------------
         // TODO: Update your variables here
         //----------------------------------------------------------------------------------
-        
-        
-        
-        
-
-        test++;
+        numCycles++;
         clock_t t1 = clock();
         ////printf("\n");
         //////printf("Memory: %x %x\n", memory[PC], memory[PC+1]); //decode for opcode
@@ -115,12 +112,12 @@ int main(void)
         ////printf("PC: %x\n",PC);
         ////printf("Opcode: %x\n",opcode ); //decode for opcode
         ////printf("%x\n",PC);
-        
         PC += 2;
-        
+        int regX = REGX(opcode);
+        int regY = REGY(opcode);
         //giant case statement TODO: put all in another file
         //////printf("%x\n", opcode & 0xF000);
-        switch(opcode & 0xF000){
+        switch(INSTRUCTION(opcode)){
             //00 - CLS or RET
             case 0x0000: {
                 //CLS - Clear Screen
@@ -132,7 +129,7 @@ int main(void)
                         }
                     }
                     BeginDrawing();
-                        DrawRectangle(0,0,640,320,BLACK);
+                        DrawRectangle(0,0,DISPLAY_COLS*PIXEL_SIZE,DISPLAY_ROWS*PIXEL_SIZE,BLACK);
                     EndDrawing();
                     //ClearBackground(BLACK);
                     //system("clear");
@@ -172,7 +169,7 @@ int main(void)
                 The interpreter compares register Vx to kk, and if they are equal, increments the program counter by 2.
             */
             case 0x3000: {
-                int regX  = (opcode & 0xF00) >> 8;
+                
                 if(registers[regX] == (opcode & 0xFF)){
                     PC += 2;
                 }
@@ -185,7 +182,7 @@ int main(void)
                 The interpreter compares register Vx to kk, and if they are not equal, increments the program counter by 2.
             */
             case 0x4000: {
-                int regX  = (opcode & 0xF00) >> 8;
+                
                 if(registers[regX] != (opcode & 0xFF)){
                     PC += 2;
                 }
@@ -198,8 +195,7 @@ int main(void)
                 The interpreter compares register Vx to register Vy, and if they are equal, increments the program counter by 2.
             */
             case 0x5000: {
-                int regX = (opcode & 0xF00) >> 8;
-                int regY = (opcode & 0xF0) >> 4;
+                
                 if(registers[regX] == registers[regY]){
                     PC += 2;
                 }
@@ -212,7 +208,7 @@ int main(void)
                 The interpreter puts the value kk into register Vx.
             */
             case 0x6000: {
-                int regX  = (opcode & 0xF00) >> 8;
+                
                 registers[regX] = opcode & 0xFF;
                 ////printf("LD - regX: %x value: %x\n", regX, opcode & 0xFF);
                 break;
@@ -223,7 +219,7 @@ int main(void)
                 Adds the value kk to the value of register Vx, then stores the result in Vx.
             */
             case 0x7000: {
-                int regX  = (opcode & 0xF00) >> 8;
+                
                 registers[regX] = registers[regX] + (opcode & 0xFF);
                 ////printf("ADD - regX: %x value: %x\n", regX, registers[regX] + (opcode & 0xFF));
                 break;
@@ -231,8 +227,6 @@ int main(void)
             //0x8xyk instructions are ALU instructions that deal with values in registers
             case 0x8000: {
                 int operation = opcode & 0xF; //get the operation to be performed
-                int regX = (opcode & 0xF00) >> 8;
-                int regY = (opcode & 0xF0) >> 4;
                 switch (operation) {
                     /*
                         8xy0 - LD Vx, Vy
@@ -438,8 +432,6 @@ int main(void)
                 it wraps around to the opposite side of the screen.
             */
             case 0xD000: {
-                int regX = (opcode & 0xF00) >> 8;
-                int regY = (opcode & 0xF0) >> 4;
                 unsigned char Vx = registers[regX] % DISPLAY_COLS;
                 unsigned char Vy = registers[regY] % DISPLAY_ROWS;
                 unsigned char nBytes = opcode & 0xF;
@@ -449,10 +441,6 @@ int main(void)
                 registers[0xF] = 0;
                 //draw
                 //assume Vx and Vy are 0
-                rowL = Vy;
-                rowU = nBytes+Vy;
-                colL = Vx;
-                colU = 8+Vx;
                 for(int row = Vy; row < nBytes+Vy; row++){
                     if(row >= DISPLAY_ROWS){
                         ////printf("Row Wrap\n");
@@ -470,7 +458,7 @@ int main(void)
                         }
                         unsigned char bit = (line & (0x80 >> ((col-Vx)%8))) >> (7-((col-Vx)%8));
                         ////printf("%x",bit);
-                        if(display[row][col] ^ bit == 1){
+                        if((display[row][col] ^ bit) == 1){
                             display[row][col] = 1;
                             update_screen = 1;
                         }
@@ -503,7 +491,6 @@ int main(void)
             */
             case 0xE000: {
                 unsigned char operation = (opcode & 0xFF);
-                int regX = (opcode & 0xF00) >> 8;
                 unsigned char Vx = registers[regX];
                 //Vx pressed
                 if(operation == 0x9E){
@@ -523,7 +510,6 @@ int main(void)
             case 0xF000: {
                 ////printf("F: %x\n", opcode);
                 unsigned short operation = (opcode & 0xFF);
-                int regX = (opcode & 0xF00) >> 8;
                 unsigned char Vx = registers[regX];
                 switch(operation){
                     /*
@@ -664,10 +650,10 @@ int main(void)
             for(int r = 0; r < DISPLAY_ROWS; r++){
                 for(int c = 0; c < DISPLAY_COLS; c++){
                     if(display[r][c] == 1){
-                        DrawRectangle((10*c)+180,(10*r)+340,10,10,WHITE);
+                        DrawRectangle((PIXEL_SIZE*c)+COL_OFFSET,(PIXEL_SIZE*r)+ROW_OFFSET,PIXEL_SIZE,PIXEL_SIZE,WHITE);
                     }
                     else{
-                        DrawRectangle((10*c)+180,(10*r)+340,10,10,BLACK);
+                        DrawRectangle((PIXEL_SIZE*c)+COL_OFFSET,(PIXEL_SIZE*r)+ROW_OFFSET,PIXEL_SIZE,PIXEL_SIZE,BLACK);
                     }
                 }
             }
@@ -681,7 +667,7 @@ int main(void)
         //----------------------------------------------------------------------------------
         if(timer_div == 0) {
             ////printf("%d\n",timer_div);
-            timer_div = 9;
+            timer_div = TIMER_DIV;
             if(delay_timer > 0){
                 delay_timer--;
             }
@@ -770,7 +756,7 @@ int main(void)
         //printf("\n");
         //wait for next cycle
         
-    usleep(1000); //2 milliseconds
+    usleep(CPU_DELAY); //1 millisecond
          
  
     
@@ -779,10 +765,10 @@ int main(void)
     clock_t t2 = clock();
  
     double dur = CLOCKS_PER_SEC/((double)(t2-t1));
-    total += dur;
+    totalHz += dur;
  
     printf("%.2f Hz ", dur);
-    printf("Avg: %.1f Hz\n",total/test);
+    printf("Avg: %.1f Hz\n",totalHz/numCycles);
     
     }
     UnloadSound(beep);     // Unload sound data
