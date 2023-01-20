@@ -6,7 +6,15 @@
 #define FONT_END 80
 #define DISPLAY_ROWS 32
 #define DISPLAY_COLS 64
-
+#define PIXEL_SIZE 10
+#define ROW_OFFSET 340
+#define COL_OFFSET 180
+#define CPU_DELAY 1000
+#define TIMER_DIV 9
+#define NUM_REGISTERS 16
+#define INSTRUCTION(opcode) opcode & 0xF000
+#define REGX(opcode) (opcode & 0xF00) >> 8
+#define REGY(opcode) (opcode & 0xF0) >> 4
 unsigned char KEY_MAP[16] = 
 {
     KEY_X,   //0
