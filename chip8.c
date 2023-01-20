@@ -57,7 +57,7 @@ int main(void)
     ////printf("Font Set Loaded\n");
 
     //load rom
-    rom = fopen("Brix.ch8","r");
+    rom = fopen("roms/Brix.ch8","r");
     if(rom == NULL){
         ////printf("ROM not found\n");
         return -1;
