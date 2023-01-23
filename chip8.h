@@ -15,6 +15,11 @@
 #define INSTRUCTION(opcode) opcode & 0xF000
 #define REGX(opcode) (opcode & 0xF00) >> 8
 #define REGY(opcode) (opcode & 0xF0) >> 4
+#define NUM_COLORS 25
+Color mapStringToColor(char* color, char colorType);
+char* colorList[NUM_COLORS] = { "LIGHTGRAY", "GRAY", "DARKGRAY", "YELLOW", "GOLD", "ORANGE", "PINK", "RED", "MAROON", "GREEN", "LIME", "DARKGREEN", "SKYBLUE", "BLUE", "DARKBLUE", "PURPLE", "VIOLET", "DARKPURPLE", "BEIGE", "BROWN", "DARKBROWN", "WHITE", "BLACK", "MAGENTA", "RAYWHITE" };
+
+
 unsigned char KEY_MAP[16] = 
 {
     KEY_X,   //0
