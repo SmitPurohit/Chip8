@@ -61,11 +61,12 @@ int main(int argc, char *argv[])
             }
             else if(!strcmp(argv[i], "-help")){
                 
-                printf("Here is a list of the colors that can be used\nUse -B {color} to set background and -F {color} to set foreground");
+                printf("Here is a list of the colors that can be used\nUse -B COLOR to set background and -F COLOR to set foreground");
                 int i;
                 for (i = 0; i < NUM_COLORS; i++) {
                     printf("%s\n", colorList[i]);
                 }
+                printf("To run a rom, rerun with -R ROM_NAME. Do not include the .ch8\n");
                 return 0;
             }
             else{
@@ -102,11 +103,11 @@ int main(int argc, char *argv[])
     sprintf(fullRomString,"roms/%s.ch8",romString);
     rom = fopen(fullRomString,"r");
     if(rom == NULL){
-        ////printf("ROM not found\n");
+        printf("ROM %s.ch8 not found\n",romString);
         return -1;
     }
     else{
-        ////printf("ROM loaded\n");
+        printf("ROM loaded\n");
     }
 
     fread(rom_buffer, sizeof(unsigned char), MEM_SIZE, rom);
