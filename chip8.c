@@ -42,6 +42,8 @@ int main(int argc, char *argv[])
     Color background = BLACK;
     Color foreground = WHITE;
 
+    //Set default rom
+    char *romString = "chip8-test-suite";
     if(argc > 1){
         //iterate through arguments
         for(int i = 1; i < argc; i++){
@@ -53,13 +55,19 @@ int main(int argc, char *argv[])
                 foreground = mapStringToColor(argv[i+1], 'F');
                 i++;
             }
+            else if(!strcmp(argv[i], "-R")){
+                romString = argv[i+1];
+                i++;
+            }
             else if(!strcmp(argv[i], "-help")){
                 
-                printf("Here is a list of the colors that can be used\nUse -B {color} to set background and -F {color} to set foreground");
+                printf("Here is a list of the colors that can be used\nUse -B COLOR to set background and -F COLOR to set foreground\n");
                 int i;
                 for (i = 0; i < NUM_COLORS; i++) {
                     printf("%s\n", colorList[i]);
                 }
+                printf("\nTo run a rom, rerun with -R ROM_NAME. Do not include the .ch8\n");
+                printf("To add a rom, put it under the roms folder\n");
                 return 0;
             }
             else{
@@ -68,21 +76,6 @@ int main(int argc, char *argv[])
             }
         }
     }
-    const int screenWidth = 1000;
-    const int screenHeight = 1000;
-
-    InitWindow(screenWidth, screenHeight, "Chip8 Emulator");
-
-    InitAudioDevice();      // Initialize audio device
-
-    Sound beep = LoadSound("beep.wav");         // Load WAV audio file
-    
-    
-    BeginDrawing();
-        DrawRectangle(179,339,642,322,foreground);
-        DrawRectangle(180,340,640,320,background);
-    EndDrawing();
-
     //load font_set
     for(int i = 0; i < FONT_END; i++){
         memory[i] = fontset[i];
@@ -91,13 +84,17 @@ int main(int argc, char *argv[])
     ////printf("Font Set Loaded\n");
 
     //load rom
-    rom = fopen("roms/Brix.ch8","r");
+    //"roms/Brix.ch8"
+    char fullRomString[100];
+    sprintf(fullRomString,"roms/%s.ch8",romString);
+    rom = fopen(fullRomString,"r");
     if(rom == NULL){
-        ////printf("ROM not found\n");
+        printf("ROM %s.ch8 not found\n",romString);
+        printf("To add a rom, put it under the roms folder\n");
         return -1;
     }
     else{
-        ////printf("ROM loaded\n");
+        printf("ROM loaded\n");
     }
 
     fread(rom_buffer, sizeof(unsigned char), MEM_SIZE, rom);
@@ -128,6 +125,23 @@ int main(int argc, char *argv[])
     int timer_div = TIMER_DIV;
     int numCycles = 0;
     double totalHz = 0;
+
+    //Initialize Screen
+    const int screenWidth = 1000;
+    const int screenHeight = 1000;
+
+    InitWindow(screenWidth, screenHeight, "Chip8 Emulator");
+
+    InitAudioDevice();      // Initialize audio device
+
+    Sound beep = LoadSound("beep.wav");         // Load WAV audio file
+    
+    
+    BeginDrawing();
+        DrawRectangle(179,339,642,322,foreground);
+        DrawRectangle(180,340,640,320,background);
+    EndDrawing();
+
     //--------------------------------------------------------------------------------------
     
 
@@ -163,7 +177,7 @@ int main(int argc, char *argv[])
                         }
                     }
                     BeginDrawing();
-                        DrawRectangle(0,0,DISPLAY_COLS*PIXEL_SIZE,DISPLAY_ROWS*PIXEL_SIZE,background);
+                        DrawRectangle(180,340,DISPLAY_COLS*PIXEL_SIZE,DISPLAY_ROWS*PIXEL_SIZE,background);
                     EndDrawing();
                     //ClearBackground(BLACK);
                     //system("clear");
