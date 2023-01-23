@@ -75,21 +75,6 @@ int main(int argc, char *argv[])
             }
         }
     }
-    const int screenWidth = 1000;
-    const int screenHeight = 1000;
-
-    InitWindow(screenWidth, screenHeight, "Chip8 Emulator");
-
-    InitAudioDevice();      // Initialize audio device
-
-    Sound beep = LoadSound("beep.wav");         // Load WAV audio file
-    
-    
-    BeginDrawing();
-        DrawRectangle(179,339,642,322,foreground);
-        DrawRectangle(180,340,640,320,background);
-    EndDrawing();
-
     //load font_set
     for(int i = 0; i < FONT_END; i++){
         memory[i] = fontset[i];
@@ -138,6 +123,23 @@ int main(int argc, char *argv[])
     int timer_div = TIMER_DIV;
     int numCycles = 0;
     double totalHz = 0;
+
+    //Initialize Screen
+    const int screenWidth = 1000;
+    const int screenHeight = 1000;
+
+    InitWindow(screenWidth, screenHeight, "Chip8 Emulator");
+
+    InitAudioDevice();      // Initialize audio device
+
+    Sound beep = LoadSound("beep.wav");         // Load WAV audio file
+    
+    
+    BeginDrawing();
+        DrawRectangle(179,339,642,322,foreground);
+        DrawRectangle(180,340,640,320,background);
+    EndDrawing();
+
     //--------------------------------------------------------------------------------------
     
 
