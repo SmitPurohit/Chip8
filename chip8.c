@@ -42,6 +42,8 @@ int main(int argc, char *argv[])
     Color background = BLACK;
     Color foreground = WHITE;
 
+    //Set default rom
+    char *romString = "chip8-test-suite";
     if(argc > 1){
         //iterate through arguments
         for(int i = 1; i < argc; i++){
@@ -51,6 +53,10 @@ int main(int argc, char *argv[])
             }
             else if(!strcmp(argv[i],"-F")){
                 foreground = mapStringToColor(argv[i+1], 'F');
+                i++;
+            }
+            else if(!strcmp(argv[i], "-R")){
+                romString = argv[i+1];
                 i++;
             }
             else if(!strcmp(argv[i], "-help")){
@@ -91,7 +97,10 @@ int main(int argc, char *argv[])
     ////printf("Font Set Loaded\n");
 
     //load rom
-    rom = fopen("roms/Brix.ch8","r");
+    //"roms/Brix.ch8"
+    char fullRomString[100];
+    sprintf(fullRomString,"roms/%s.ch8",romString);
+    rom = fopen(fullRomString,"r");
     if(rom == NULL){
         ////printf("ROM not found\n");
         return -1;
@@ -163,7 +172,7 @@ int main(int argc, char *argv[])
                         }
                     }
                     BeginDrawing();
-                        DrawRectangle(0,0,DISPLAY_COLS*PIXEL_SIZE,DISPLAY_ROWS*PIXEL_SIZE,background);
+                        DrawRectangle(180,340,DISPLAY_COLS*PIXEL_SIZE,DISPLAY_ROWS*PIXEL_SIZE,background);
                     EndDrawing();
                     //ClearBackground(BLACK);
                     //system("clear");
