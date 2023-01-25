@@ -13,4 +13,4 @@ $(EXE): $(SOURCES)
 clean:
 	rm -f $(EXE)
 
-.PHONY: all clean
+
