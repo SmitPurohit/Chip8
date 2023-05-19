@@ -153,6 +153,7 @@ int main(int argc, char *argv[])
     
     
     BeginDrawing();
+        DrawText(romString, 0, 0, 20, RAYWHITE);
         DrawRectangle(179,339,642,322,foreground);
         DrawRectangle(180,340,640,320,background);
     EndDrawing();
@@ -192,6 +193,7 @@ int main(int argc, char *argv[])
                         }
                     }
                     BeginDrawing();
+                        DrawText(romString, 0, 0, 20, RAYWHITE);
                         DrawRectangle(180,340,DISPLAY_COLS*PIXEL_SIZE,DISPLAY_ROWS*PIXEL_SIZE,background);
                     EndDrawing();
                     //ClearBackground(BLACK);
@@ -707,7 +709,7 @@ int main(int argc, char *argv[])
         
         if(update_screen == 1 && timer_div == 0){
             BeginDrawing();
-             
+            DrawText(romString, 0, 0, 20, RAYWHITE);
             DrawRectangle(179,339,642,322,foreground);
             DrawRectangle(180,340,640,320,background);
             for(int r = 0; r < DISPLAY_ROWS; r++){
