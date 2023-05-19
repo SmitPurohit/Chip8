@@ -28,8 +28,10 @@
 #include "chip8.h"
 #include <unistd.h>
 #include <stdint.h>
+#include <dirent.h>
 
 FILE *rom;
+DIR *d;
 
 //Arguments:
 //  -B BackgroundColor
@@ -43,7 +45,7 @@ int main(int argc, char *argv[])
     Color foreground = WHITE;
 
     //Set default rom
-    char *romString = "chip8-test-suite";
+    char *romString = "Tetris";
     if(argc > 1){
         //iterate through arguments
         for(int i = 1; i < argc; i++){
@@ -67,19 +69,32 @@ int main(int argc, char *argv[])
                     printf("%s\n", colorList[i]);
                 }
                 printf("\nTo run a rom, rerun with -R ROM_NAME. Do not include the .ch8\n");
-                printf("To add a rom, put it under the roms folder\n");
+                printf("To add a rom, put it under the roms folder\n\n");
+                // Open the directory
+                struct dirent *dir;
+                d = opendir("./roms");
+                if (d) {
+                    printf("Here is the list of roms to choose from:\n\n");
+                    while ((dir = readdir(d)) != NULL) {
+                        if(strstr(dir->d_name, ".ch8"))
+                            printf("%s\n", dir->d_name);
+                    }
+                    closedir(d);
+                }
+                else{
+                    printf("Directory ./roms can not be read or does not exist\n");
+                    return -1;
+                }
                 return 0;
             }
             else{
-                printf("%s not valid\n",argv[i]);
+                printf("%s is not valid\n",argv[i]);
                 return -1;
             }
         }
     }
     //load font_set
-    for(int i = 0; i < FONT_END; i++){
-        memory[i] = fontset[i];
-    }
+    memcpy(memory, fontset, FONT_END*sizeof(unsigned char));
 
     ////printf("Font Set Loaded\n");
 
@@ -98,11 +113,11 @@ int main(int argc, char *argv[])
     }
 
     fread(rom_buffer, sizeof(unsigned char), MEM_SIZE, rom);
+    fclose(rom);
 
     for(int i = 0; i < MEM_SIZE; i++){
         memory[i + PROGRAM_START] = rom_buffer[i];
     }
-    fclose(rom);
 
     //emulation initialization
     PC = PROGRAM_START;
