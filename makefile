@@ -1,4 +1,4 @@
-SOURCES = chip8.c
+SOURCES = ./src/chip8.c
 EXE = chip8.exe
 CFLAGS = -Wall -Wextra -Wpedantic -Werror
 LDFLAGS = -I include -L lib
