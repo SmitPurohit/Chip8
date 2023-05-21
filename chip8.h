@@ -16,6 +16,8 @@
 #define REGX(opcode) (opcode & 0xF00) >> 8
 #define REGY(opcode) (opcode & 0xF0) >> 4
 #define NUM_COLORS 25
+#define NUM_CONTROL_KEYS 1
+
 Color mapStringToColor(char* color, char colorType);
 char* colorList[NUM_COLORS] = { "LIGHTGRAY", "GRAY", "DARKGRAY", "YELLOW", "GOLD", "ORANGE", "PINK", "RED", "MAROON", "GREEN", "LIME", "DARKGREEN", "SKYBLUE", "BLUE", "DARKBLUE", "PURPLE", "VIOLET", "DARKPURPLE", "BEIGE", "BROWN", "DARKBROWN", "WHITE", "BLACK", "MAGENTA", "RAYWHITE" };
 
@@ -39,6 +41,11 @@ unsigned char KEY_MAP[16] =
     KEY_F, //E
     KEY_V, //F
 };
+
+//Set the size of this to however many control buttons there are
+//0: Pause/Play
+
+unsigned char CONTROL_KEY_MAP[NUM_CONTROL_KEYS] = {KEY_P};
 /*unsigned char KEY_MAP[16] = 
 {
     'x',   //0
@@ -82,7 +89,7 @@ unsigned char display[DISPLAY_ROWS][DISPLAY_COLS];
 unsigned char rom_buffer[MEM_SIZE];
 unsigned char memory[MEM_SIZE];
 unsigned short opcode;
-unsigned char registers[16];
+unsigned char registers[NUM_REGISTERS];
 unsigned short I;
 unsigned char delay_timer;
 unsigned char sound_timer;
@@ -93,3 +100,4 @@ unsigned char keyboard[16];
 unsigned char key_pressed;
 volatile char update_screen;
 unsigned char display_interrupt;
+int paused = 0;
