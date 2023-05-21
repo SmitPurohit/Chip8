@@ -149,7 +149,7 @@ int main(int argc, char *argv[])
 
     InitAudioDevice();      // Initialize audio device
 
-    Sound beep = LoadSound("beep.wav");         // Load WAV audio file
+    Sound beep = LoadSound("./resources/beep.wav");         // Load WAV audio file
     
     
     BeginDrawing();
