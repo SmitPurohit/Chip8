@@ -706,7 +706,23 @@ int main(int argc, char *argv[])
         
         // Draw
         //---------------------------------------------------------------------------------
-        
+        //Get status of Control Keys
+        for(int i = 0; i < NUM_CONTROL_KEYS; i++){
+            if(IsKeyPressed(CONTROL_KEY_MAP[i])){
+                //Pause/Play
+                if(i == 0){
+                    paused = 1;
+                }
+            }
+            
+        }
+        while(paused){
+            printf("%i\n",paused);
+            PollInputEvents();
+            if(IsKeyPressed(CONTROL_KEY_MAP[0])){
+                paused = 0;
+            }
+        };
         if(update_screen == 1 && timer_div == 0){
             BeginDrawing();
             DrawText(romString, 0, 0, 20, RAYWHITE);
@@ -726,7 +742,13 @@ int main(int argc, char *argv[])
             EndDrawing();
         }
         PollInputEvents();
-        
+        while(paused){
+            printf("%i\n",paused);
+            if(IsKeyPressed(CONTROL_KEY_MAP[0])){
+                printf("%i\n",paused);
+                paused = 0;
+            }
+        };
     
         
         //----------------------------------------------------------------------------------
@@ -832,8 +854,8 @@ int main(int argc, char *argv[])
     double dur = CLOCKS_PER_SEC/((double)(t2-t1));
     totalHz += dur;
  
-    printf("%.2f Hz ", dur);
-    printf("Avg: %.1f Hz\n",totalHz/numCycles);
+    //printf("%.2f Hz ", dur);
+    //printf("Avg: %.1f Hz\n",totalHz/numCycles);
     
     }
     UnloadSound(beep);     // Unload sound data
