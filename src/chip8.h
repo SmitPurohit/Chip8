@@ -1,5 +1,6 @@
 
 #include <raylib.h>
+#include <stdint.h>
 
 #define MEM_SIZE 4096
 #define PROGRAM_START 512
@@ -22,7 +23,7 @@ Color mapStringToColor(char* color, char colorType);
 char* colorList[NUM_COLORS] = { "LIGHTGRAY", "GRAY", "DARKGRAY", "YELLOW", "GOLD", "ORANGE", "PINK", "RED", "MAROON", "GREEN", "LIME", "DARKGREEN", "SKYBLUE", "BLUE", "DARKBLUE", "PURPLE", "VIOLET", "DARKPURPLE", "BEIGE", "BROWN", "DARKBROWN", "WHITE", "BLACK", "MAGENTA", "RAYWHITE" };
 
 
-unsigned char KEY_MAP[16] = 
+uint8_t KEY_MAP[16] = 
 {
     KEY_X,   //0
     KEY_ONE, //1
@@ -45,7 +46,7 @@ unsigned char KEY_MAP[16] =
 //Set the size of this to however many control buttons there are
 //0: Pause/Play
 
-unsigned char CONTROL_KEY_MAP[NUM_CONTROL_KEYS] = {KEY_P};
+uint8_t CONTROL_KEY_MAP[NUM_CONTROL_KEYS] = {KEY_P};
 /*unsigned char KEY_MAP[16] = 
 {
     'x',   //0
@@ -65,7 +66,7 @@ unsigned char CONTROL_KEY_MAP[NUM_CONTROL_KEYS] = {KEY_P};
     'f', //E
     'v', //F
 };*/
-unsigned char fontset[FONT_END] =
+uint8_t fontset[FONT_END] =
 { 
   0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
   0x20, 0x60, 0x20, 0x20, 0x70, // 1
@@ -85,19 +86,19 @@ unsigned char fontset[FONT_END] =
   0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 };
 
-unsigned char display[DISPLAY_ROWS][DISPLAY_COLS];
-unsigned char rom_buffer[MEM_SIZE];
-unsigned char memory[MEM_SIZE];
-unsigned short opcode;
-unsigned char registers[NUM_REGISTERS];
-unsigned short I;
-unsigned char delay_timer;
-unsigned char sound_timer;
-unsigned short PC;
-unsigned short SP;
-unsigned short stack[16];
-unsigned char keyboard[16];
-unsigned char key_pressed;
-volatile char update_screen;
-unsigned char display_interrupt;
-int paused = 0;
+uint8_t display[DISPLAY_ROWS][DISPLAY_COLS];
+uint8_t rom_buffer[MEM_SIZE];
+uint8_t memory[MEM_SIZE];
+uint16_t opcode;
+uint8_t  registers[NUM_REGISTERS];
+uint16_t I;
+uint8_t delay_timer;
+uint8_t sound_timer;
+uint16_t PC;
+uint16_t SP;
+uint16_t stack[16];
+uint8_t keyboard[16];
+uint8_t key_pressed;
+uint8_t update_screen;
+uint8_t display_interrupt;
+uint8_t paused = 0;

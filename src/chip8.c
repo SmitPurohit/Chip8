@@ -1,33 +1,8 @@
-/*******************************************************************************************
-*
-*   raylib [core] example - Basic window
-*
-*   Welcome to raylib!
-*
-*   To test examples, just press F6 and execute raylib_compile_execute script
-*   Note that compiled executable is placed in the same folder as .c file
-*
-*   You can find all basic examples on C:\raylib\raylib\examples folder or
-*   raylib official webpage: www.raylib.com
-*
-*   Enjoy using raylib. :)
-*
-*   Example originally created with raylib 1.0, last time updated with raylib 1.0
-*
-*   Example licensed under an unmodified zlib/libpng license, which is an OSI-certified,
-*   BSD-like license that allows static linking with closed source software
-*
-*   Copyright (c) 2013-2022 Ramon Santamaria (@raysan5)
-*
-********************************************************************************************/
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include "chip8.h"
 #include <unistd.h>
-#include <stdint.h>
 #include <dirent.h>
 
 FILE *rom;
@@ -142,8 +117,8 @@ int main(int argc, char *argv[])
     double totalHz = 0;
 
     //Initialize Screen
-    const int screenWidth = 1000;
-    const int screenHeight = 1000;
+    const unsigned int screenWidth = 1000;
+    const unsigned int screenHeight = 1000;
 
     InitWindow(screenWidth, screenHeight, "Chip8 Emulator");
 
@@ -164,10 +139,6 @@ int main(int argc, char *argv[])
     // Main game loop
     while (!WindowShouldClose() && PC < MEM_SIZE)    // Detect window close button or ESC key
     {
-        // Update
-        //----------------------------------------------------------------------------------
-        // TODO: Update your variables here
-        //----------------------------------------------------------------------------------
         numCycles++;
         clock_t t1 = clock();
         ////printf("\n");
@@ -344,7 +315,7 @@ int main(int argc, char *argv[])
                         Only the lowest 8 bits of the result are kept, and stored in Vx.
                     */
                     case 0x4: {
-                        unsigned short result = registers[regX] + registers[regY];
+                        uint16_t result = registers[regX] + registers[regY];
                         ////printf("ADD - regX: %x Vx: %x regY: %x Vy: %x result: %x\n", regX, registers[regX], regY, registers[regY], result);
                         registers[regX] = result & 0xFF; //convert from 16 bit to 8 bit
                         if (result > 255){
@@ -362,7 +333,7 @@ int main(int argc, char *argv[])
                         Then Vy is subtracted from Vx, and the results stored in Vx.
                     */
                     case 0x5: {
-                        char result = registers[regX] - registers[regY];
+                        uint8_t result = registers[regX] - registers[regY];
                         if (registers[regX] > registers[regY]){
                             registers[0xF] = 1;
                         }
@@ -380,7 +351,7 @@ int main(int argc, char *argv[])
                         Then Vx is divided by 2.
                     */
                     case 0x6: {
-                        unsigned char Vx = registers[regY];
+                        uint8_t Vx = registers[regY];
                         
                         registers[regX] = registers[regY] >> 1;
                         ////printf("SHR - regX: %x Vx: %x\n", regX, registers[regX]);
@@ -399,7 +370,7 @@ int main(int argc, char *argv[])
                         Then Vx is subtracted from Vy, and the results stored in Vx.
                     */
                     case 0x7: {
-                        unsigned char result = registers[regY] - registers[regX];
+                        uint8_t result = registers[regY] - registers[regX];
                         if (registers[regY] > registers[regX]){
                             registers[0xF] = 1;
                         }
@@ -417,7 +388,7 @@ int main(int argc, char *argv[])
                         Then Vx is multiplied by 2.
                     */
                     case 0xE: {
-                        unsigned char Vx = registers[regY];
+                        uint8_t Vx = registers[regY];
                         
                         registers[regX] = registers[regY] << 1;
                         ////printf("SHL - regX: %x Vx: %x\n", regX, registers[regX]);
@@ -480,8 +451,8 @@ int main(int argc, char *argv[])
             */
             case 0xC000: {
                 int regX = (opcode & 0xF00) >> 8;
-                unsigned char byte = opcode & 0xFF;
-                unsigned char randByte = rand() % 255;
+                uint8_t byte = opcode & 0xFF;
+                uint8_t randByte = rand() % 255;
                 registers[regX] = randByte & byte;
                 ////printf("RND - regX: %x, Vx: %x\n", regX, registers[regX]);
                 break;
@@ -497,9 +468,9 @@ int main(int argc, char *argv[])
                 it wraps around to the opposite side of the screen.
             */
             case 0xD000: {
-                unsigned char Vx = registers[regX] % DISPLAY_COLS;
-                unsigned char Vy = registers[regY] % DISPLAY_ROWS;
-                unsigned char nBytes = opcode & 0xF;
+                uint8_t Vx = registers[regX] % DISPLAY_COLS;
+                uint8_t Vy = registers[regY] % DISPLAY_ROWS;
+                uint8_t nBytes = opcode & 0xF;
                 ////printf("x: %d y:%d \n", Vx, Vy);
                 //read n-bytes from memory
                 
@@ -511,7 +482,7 @@ int main(int argc, char *argv[])
                         ////printf("Row Wrap\n");
                         break;
                     }
-                    unsigned char line = memory[(row - Vy)+I];//sprite[row - Vy];
+                    uint8_t line = memory[(row - Vy)+I];//sprite[row - Vy];
                     ////printf("Row: %d\n",row);
                     ////printf("Line: %x\n",line);
                     for(int col = Vx; col < 8+Vx; col++){
@@ -521,7 +492,7 @@ int main(int argc, char *argv[])
                             ////printf("Col Wrap\n");
                             break;
                         }
-                        unsigned char bit = (line & (0x80 >> ((col-Vx)%8))) >> (7-((col-Vx)%8));
+                        uint8_t bit = (line & (0x80 >> ((col-Vx)%8))) >> (7-((col-Vx)%8));
                         ////printf("%x",bit);
                         if((display[row][col] ^ bit) == 1){
                             display[row][col] = 1;
@@ -555,8 +526,8 @@ int main(int argc, char *argv[])
                 up position, PC is increased by 2.
             */
             case 0xE000: {
-                unsigned char operation = (opcode & 0xFF);
-                unsigned char Vx = registers[regX];
+                uint8_t operation = (opcode & 0xFF);
+                uint8_t Vx = registers[regX];
                 //Vx pressed
                 if(operation == 0x9E){
                     if(keyboard[Vx] == 1){
@@ -574,8 +545,8 @@ int main(int argc, char *argv[])
             //0xF--- instructions
             case 0xF000: {
                 ////printf("F: %x\n", opcode);
-                unsigned short operation = (opcode & 0xFF);
-                unsigned char Vx = registers[regX];
+                uint16_t operation = (opcode & 0xFF);
+                uint8_t Vx = registers[regX];
                 switch(operation){
                     /*
                         Fx07 - LD Vx, DT
@@ -639,7 +610,7 @@ int main(int argc, char *argv[])
                         The values of I and Vx are added, and the results are stored in I.
                     */
                     case 0x1E: {
-                        unsigned short sum = I + Vx;
+                        uint16_t sum = I + Vx;
                         //add overflow check here (might not be needed?)
                         I = sum;
                         break;
@@ -652,7 +623,7 @@ int main(int argc, char *argv[])
                     */
                     case 0x29: {
                         //each digit is 5 bytes long
-                        unsigned char sprite_location = Vx * 5;
+                        uint8_t sprite_location = Vx * 5;
                         I = sprite_location;
                         break;
                     }
@@ -704,8 +675,7 @@ int main(int argc, char *argv[])
             }
         }
         
-        // Draw
-        //---------------------------------------------------------------------------------
+       
         //Get status of Control Keys
         for(int i = 0; i < NUM_CONTROL_KEYS; i++){
             if(IsKeyPressed(CONTROL_KEY_MAP[i])){
@@ -717,12 +687,14 @@ int main(int argc, char *argv[])
             
         }
         while(paused){
-            printf("%i\n",paused);
+            //printf("%i\n",paused);
             PollInputEvents();
             if(IsKeyPressed(CONTROL_KEY_MAP[0])){
                 paused = 0;
             }
         };
+
+        //Draw
         if(update_screen == 1 && timer_div == 0){
             BeginDrawing();
             DrawText(romString, 0, 0, 20, RAYWHITE);
@@ -741,9 +713,10 @@ int main(int argc, char *argv[])
             update_screen = 0;
             EndDrawing();
         }
+
         PollInputEvents();
         while(paused){
-            printf("%i\n",paused);
+            //printf("%i\n",paused);
             if(IsKeyPressed(CONTROL_KEY_MAP[0])){
                 printf("%i\n",paused);
                 paused = 0;
@@ -763,6 +736,7 @@ int main(int argc, char *argv[])
                 PlaySound(beep); 
             }
             
+            //Uncomment the code below to run emulator in terminal
             /*
             if(update_screen == 1){
                 system("clear");
